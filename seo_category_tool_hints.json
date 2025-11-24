@@ -1,0 +1,171 @@
+{
+  "gsc_properties": {
+    "gsc": [
+      "list_properties",
+      "add_site",
+      "delete_site",
+      "get_search_analytics",
+      "get_site_details",
+      "get_sitemaps",
+      "inspect_url_enhanced",
+      "batch_url_inspection",
+      "check_indexing_issues",
+      "get_performance_overview",
+      "get_advanced_search_analytics",
+      "compare_search_periods",
+      "get_search_by_page_query",
+      "list_sitemaps_enhanced",
+      "get_sitemap_details",
+      "submit_sitemap",
+      "delete_sitemap",
+      "manage_sitemaps"
+    ]
+  },
+  "gsc_pages": {
+    "gsc": [
+      "add_site",
+      "delete_site",
+      "get_search_analytics",
+      "get_site_details",
+      "get_sitemaps",
+      "inspect_url_enhanced",
+      "batch_url_inspection",
+      "check_indexing_issues",
+      "get_performance_overview",
+      "get_advanced_search_analytics",
+      "compare_search_periods",
+      "get_search_by_page_query",
+      "list_sitemaps_enhanced",
+      "get_sitemap_details",
+      "submit_sitemap",
+      "delete_sitemap",
+      "manage_sitemaps"
+    ]
+  },
+  "gsc_performance": {
+    "gsc": [
+      "get_search_analytics",
+      "get_performance_overview",
+      "get_advanced_search_analytics",
+      "compare_search_periods",
+      "get_search_by_page_query"
+    ]
+  },
+  "gsc_queries": {
+    "gsc": [
+      "get_search_analytics",
+      "get_advanced_search_analytics",
+      "compare_search_periods",
+      "get_search_by_page_query"
+    ]
+  },
+  "technical_audit": {
+    "gsc": [
+      "get_sitemaps",
+      "inspect_url_enhanced",
+      "check_indexing_issues",
+      "list_sitemaps_enhanced",
+      "get_sitemap_details",
+      "submit_sitemap",
+      "delete_sitemap",
+      "manage_sitemaps"
+    ]
+  },
+  "gsc_misc": {
+    "gsc": ["get_creator_info"]
+  },
+  "keywords": {
+    "dataforseo": [
+      "ai_optimization_keyword_data_locations_and_languages",
+      "ai_optimization_keyword_data_search_volume",
+      "keywords_data_google_ads_search_volume",
+      "keywords_data_dataforseo_trends_demography",
+      "keywords_data_dataforseo_trends_subregion_interests",
+      "keywords_data_dataforseo_trends_explore",
+      "keywords_data_google_trends_categories",
+      "keywords_data_google_trends_explore",
+      "dataforseo_labs_google_ranked_keywords",
+      "dataforseo_labs_google_keyword_ideas",
+      "dataforseo_labs_google_related_keywords",
+      "dataforseo_labs_google_keyword_suggestions",
+      "dataforseo_labs_bulk_keyword_difficulty",
+      "dataforseo_labs_google_keyword_overview",
+      "dataforseo_labs_google_keywords_for_site",
+      "dataforseo_labs_google_historical_keyword_data"
+    ]
+  },
+  "serp": {
+    "dataforseo": [
+      "serp_organic_live_advanced",
+      "serp_locations",
+      "serp_youtube_locations",
+      "serp_youtube_organic_live_advanced",
+      "serp_youtube_video_info_live_advanced",
+      "serp_youtube_video_comments_live_advanced",
+      "serp_youtube_video_subtitles_live_advanced",
+      "dataforseo_labs_google_historical_serp",
+      "dataforseo_labs_google_serp_competitors"
+    ]
+  },
+  "paid_search": {
+    "dataforseo": ["keywords_data_google_ads_search_volume"]
+  },
+  "dataforseo_misc": {
+    "dataforseo": [
+      "on_page_content_parsing",
+      "on_page_instant_pages",
+      "on_page_lighthouse",
+      "dataforseo_labs_google_competitors_domain",
+      "dataforseo_labs_google_subdomains",
+      "dataforseo_labs_google_top_searches",
+      "dataforseo_labs_search_intent",
+      "dataforseo_labs_google_domain_intersection",
+      "dataforseo_labs_google_page_intersection",
+      "dataforseo_labs_available_filters",
+      "dataforseo_labs_google_relevant_pages",
+      "business_data_business_listings_search",
+      "domain_analytics_whois_overview",
+      "domain_analytics_whois_available_filters",
+      "domain_analytics_technologies_domain_technologies",
+      "domain_analytics_technologies_available_filters",
+      "content_analysis_search",
+      "content_analysis_summary",
+      "content_analysis_phrase_trends"
+    ]
+  },
+  "rank_tracking": {
+    "dataforseo": [
+      "dataforseo_labs_google_ranked_keywords",
+      "dataforseo_labs_google_domain_rank_overview",
+      "dataforseo_labs_google_historical_rank_overview",
+      "backlinks_bulk_ranks"
+    ]
+  },
+  "domain_insights": {
+    "dataforseo": ["dataforseo_labs_bulk_traffic_estimation"]
+  },
+  "backlinks": {
+    "dataforseo": [
+      "backlinks_backlinks",
+      "backlinks_anchors",
+      "backlinks_bulk_backlinks",
+      "backlinks_bulk_new_lost_referring_domains",
+      "backlinks_bulk_new_lost_backlinks",
+      "backlinks_bulk_ranks",
+      "backlinks_bulk_referring_domains",
+      "backlinks_bulk_spam_score",
+      "backlinks_competitors",
+      "backlinks_domain_intersection",
+      "backlinks_domain_pages_summary",
+      "backlinks_domain_pages",
+      "backlinks_page_intersection",
+      "backlinks_referring_domains",
+      "backlinks_referring_networks",
+      "backlinks_summary",
+      "backlinks_timeseries_new_lost_summary",
+      "backlinks_timeseries_summary",
+      "backlinks_bulk_pages_summary",
+      "backlinks_available_filters"
+    ]
+  }
+}
