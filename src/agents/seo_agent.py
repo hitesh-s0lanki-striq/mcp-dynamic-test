@@ -22,7 +22,7 @@ class SEOAgent:
         
         # New: planner
         self.planner = SEOQueryPlanner(base_llm=self.model)
-        self._tool_selector = SEOToolSelector(seo_tools=self.seo_tools)
+        self._tool_selector = SEOToolSelector(seo_tools=self.seo_tools, llm=self.model)
         self._code_generator = SEOCodeGenerator(base_llm=self.model)
         self._executor = SEOCodeExecutor(seo_tools=self.seo_tools)
         self._summarizer = SEOSummarizer(base_llm=self.model)

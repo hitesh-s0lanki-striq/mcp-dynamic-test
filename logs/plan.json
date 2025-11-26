@@ -1,1 +1,39 @@
-{"original_query": "See analysis for Strique.io", "summary": "To analyze Strique.io, we will first gather performance data from Google Search Console, then examine keyword rankings and competition using DataForSEO, and finally review the site's technical health.", "steps": [{"step_id": 1, "server": "gsc", "step_goal": "Retrieve performance data for Strique.io from Google Search Console to understand its current traffic, queries, and page performance.", "selected_tool_names": ["get_search_analytics", "get_performance_overview", "get_advanced_search_analytics", "compare_search_periods", "get_search_by_page_query"], "notes": "Selected tools based on categories and name-hints."}, {"step_id": 2, "server": "dataforseo", "step_goal": "Analyze the keyword rankings and competition for Strique.io using DataForSEO to identify opportunities and challenges.", "selected_tool_names": ["ai_optimization_keyword_data_locations_and_languages", "ai_optimization_keyword_data_search_volume", "keywords_data_google_ads_search_volume", "keywords_data_dataforseo_trends_demography", "keywords_data_dataforseo_trends_subregion_interests", "keywords_data_dataforseo_trends_explore"], "notes": "Selected tools based on categories and name-hints."}, {"step_id": 3, "server": "none", "step_goal": "Conduct a technical audit of Strique.io to identify any issues that might affect its SEO performance.", "selected_tool_names": [], "notes": "No tools needed (reasoning-only step)."}]}
+{
+  "original_query": "Backlinks analysis for strique.io",
+  "summary": "To perform a backlinks analysis for strique.io, we will gather data on existing backlinks, analyze their quality and relevance, and identify opportunities for improvement.",
+  "steps": [
+    {
+      "step_id": 1,
+      "server": "dataforseo",
+      "step_goal": "Retrieve a list of current backlinks for strique.io.",
+      "selected_tool_names": [
+        "backlinks_backlinks",
+        "backlinks_bulk_backlinks",
+        "backlinks_referring_domains"
+      ],
+      "notes": "Selected tools focus on retrieving comprehensive backlink data and referring domains."
+    },
+    {
+      "step_id": 2,
+      "server": "dataforseo",
+      "step_goal": "Analyze the quality and relevance of the backlinks for strique.io.",
+      "selected_tool_names": [
+        "backlinks_bulk_spam_score",
+        "backlinks_anchors",
+        "backlinks_summary"
+      ],
+      "notes": "Tools chosen for analyzing backlink quality, anchor text, and overall summary."
+    },
+    {
+      "step_id": 3,
+      "server": "dataforseo",
+      "step_goal": "Identify potential opportunities for acquiring new high-quality backlinks.",
+      "selected_tool_names": [
+        "backlinks_competitors",
+        "backlinks_domain_intersection",
+        "backlinks_page_intersection"
+      ],
+      "notes": "Tools selected to identify competitor backlinks and potential new backlink opportunities."
+    }
+  ]
+}
