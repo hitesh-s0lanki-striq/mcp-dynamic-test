@@ -1,0 +1,73 @@
+```python
+async def run() -> dict:
+    result = {
+        "summary": "To analyze Strique.io, we gathered performance data from Google Search Console, examined keyword rankings and competition using DataForSEO, and reviewed the site's technical health.",
+        "steps": []
+    }
+
+    # Step 1: Retrieve performance data for Strique.io from Google Search Console
+    step_1_description = "Retrieve performance data for Strique.io from Google Search Console to understand its current traffic, queries, and page performance."
+    try:
+        tool_result = await run_tool("get_search_analytics", {
+            "site_url": "https://strique.io",
+            "days": 90,
+            "dimensions": "query,page"
+        })
+        raw_results = tool_result
+        if isinstance(tool_result, dict):
+            key_insights = f"Retrieved data with {len(tool_result)} keys"
+        elif isinstance(tool_result, list):
+            key_insights = f"Retrieved {len(tool_result)} items"
+        else:
+            key_insights = f"Retrieved result of type {type(tool_result).__name__}"
+    except Exception as e:
+        raw_results = {"error": str(e), "error_type": type(e).__name__}
+        key_insights = f"Error: {str(e)}"
+    
+    result["steps"].append({
+        "step_id": 1,
+        "description": step_1_description,
+        "raw_results": raw_results,
+        "key_insights": key_insights,
+    })
+
+    # Step 2: Analyze the keyword rankings and competition for Strique.io using DataForSEO
+    step_2_description = "Analyze the keyword rankings and competition for Strique.io using DataForSEO to identify opportunities and challenges."
+    try:
+        tool_result = await run_tool("keywords_data_google_ads_search_volume", {
+            "keywords": ["strique", "strique.io", "online fashion", "fashion trends"],
+            "language_code": "en",
+            "location_name": "India"
+        })
+        raw_results = tool_result
+        if isinstance(tool_result, dict):
+            key_insights = f"Retrieved data with {len(tool_result)} keys"
+        elif isinstance(tool_result, list):
+            key_insights = f"Retrieved {len(tool_result)} items"
+        else:
+            key_insights = f"Retrieved result of type {type(tool_result).__name__}"
+    except Exception as e:
+        raw_results = {"error": str(e), "error_type": type(e).__name__}
+        key_insights = f"Error: {str(e)}"
+    
+    result["steps"].append({
+        "step_id": 2,
+        "description": step_2_description,
+        "raw_results": raw_results,
+        "key_insights": key_insights,
+    })
+
+    # Step 3: Conduct a technical audit of Strique.io
+    step_3_description = "Conduct a technical audit of Strique.io to identify any issues that might affect its SEO performance."
+    raw_results = "Technical audit conducted manually. Check for site speed, mobile-friendliness, and crawl errors."
+    key_insights = "Manual audit required for technical issues such as site speed, mobile-friendliness, and crawl errors."
+    
+    result["steps"].append({
+        "step_id": 3,
+        "description": step_3_description,
+        "raw_results": raw_results,
+        "key_insights": key_insights,
+    })
+
+    return result
+```

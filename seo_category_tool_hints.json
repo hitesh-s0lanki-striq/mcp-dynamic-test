@@ -2,8 +2,6 @@
   "gsc_properties": {
     "gsc": [
       "list_properties",
-      "add_site",
-      "delete_site",
       "get_search_analytics",
       "get_site_details",
       "get_sitemaps",
