@@ -1,73 +1,85 @@
 ```python
 async def run() -> dict:
-    result = {
-        "summary": "To analyze Strique.io, we gathered performance data from Google Search Console, examined keyword rankings and competition using DataForSEO, and reviewed the site's technical health.",
-        "steps": []
-    }
+    domain = "strique.io"
+    steps = []
 
-    # Step 1: Retrieve performance data for Strique.io from Google Search Console
-    step_1_description = "Retrieve performance data for Strique.io from Google Search Console to understand its current traffic, queries, and page performance."
+    # Step 1: Retrieve a list of current backlinks for strique.io.
     try:
-        tool_result = await run_tool("get_search_analytics", {
-            "site_url": "https://strique.io",
-            "days": 90,
-            "dimensions": "query,page"
+        tool_result = await run_tool("backlinks_backlinks", {
+            "target": domain,
+            "mode": "as_is",
+            "limit": 10,
+            "offset": 0
         })
         raw_results = tool_result
-        if isinstance(tool_result, dict):
-            key_insights = f"Retrieved data with {len(tool_result)} keys"
-        elif isinstance(tool_result, list):
-            key_insights = f"Retrieved {len(tool_result)} items"
+        if isinstance(tool_result, list):
+            key_insights = f"Retrieved {len(tool_result)} backlinks."
         else:
             key_insights = f"Retrieved result of type {type(tool_result).__name__}"
     except Exception as e:
         raw_results = {"error": str(e), "error_type": type(e).__name__}
         key_insights = f"Error: {str(e)}"
     
-    result["steps"].append({
+    steps.append({
         "step_id": 1,
-        "description": step_1_description,
+        "description": "Retrieve a list of current backlinks for strique.io.",
         "raw_results": raw_results,
         "key_insights": key_insights,
     })
 
-    # Step 2: Analyze the keyword rankings and competition for Strique.io using DataForSEO
-    step_2_description = "Analyze the keyword rankings and competition for Strique.io using DataForSEO to identify opportunities and challenges."
+    # Step 2: Analyze the quality and relevance of the backlinks for strique.io.
     try:
-        tool_result = await run_tool("keywords_data_google_ads_search_volume", {
-            "keywords": ["strique", "strique.io", "online fashion", "fashion trends"],
-            "language_code": "en",
-            "location_name": "India"
+        tool_result = await run_tool("backlinks_summary", {
+            "target": domain,
+            "include_subdomains": True,
+            "exclude_internal_backlinks": True
         })
         raw_results = tool_result
         if isinstance(tool_result, dict):
-            key_insights = f"Retrieved data with {len(tool_result)} keys"
-        elif isinstance(tool_result, list):
-            key_insights = f"Retrieved {len(tool_result)} items"
+            key_insights = f"Retrieved data with {len(tool_result)} keys."
         else:
             key_insights = f"Retrieved result of type {type(tool_result).__name__}"
     except Exception as e:
         raw_results = {"error": str(e), "error_type": type(e).__name__}
         key_insights = f"Error: {str(e)}"
     
-    result["steps"].append({
+    steps.append({
         "step_id": 2,
-        "description": step_2_description,
+        "description": "Analyze the quality and relevance of the backlinks for strique.io.",
         "raw_results": raw_results,
         "key_insights": key_insights,
     })
 
-    # Step 3: Conduct a technical audit of Strique.io
-    step_3_description = "Conduct a technical audit of Strique.io to identify any issues that might affect its SEO performance."
-    raw_results = "Technical audit conducted manually. Check for site speed, mobile-friendliness, and crawl errors."
-    key_insights = "Manual audit required for technical issues such as site speed, mobile-friendliness, and crawl errors."
+    # Step 3: Identify potential opportunities for acquiring new high-quality backlinks.
+    try:
+        tool_result = await run_tool("backlinks_competitors", {
+            "target": domain,
+            "limit": 10,
+            "offset": 0,
+            "main_domain": True,
+            "exclude_large_domains": True,
+            "exclude_internal_backlinks": True
+        })
+        raw_results = tool_result
+        if isinstance(tool_result, list):
+            key_insights = f"Retrieved {len(tool_result)} competitor domains."
+        else:
+            key_insights = f"Retrieved result of type {type(tool_result).__name__}"
+    except Exception as e:
+        raw_results = {"error": str(e), "error_type": type(e).__name__}
+        key_insights = f"Error: {str(e)}"
     
-    result["steps"].append({
+    steps.append({
         "step_id": 3,
-        "description": step_3_description,
+        "description": "Identify potential opportunities for acquiring new high-quality backlinks.",
         "raw_results": raw_results,
         "key_insights": key_insights,
     })
+
+    result = {
+        "summary": "Backlinks analysis for strique.io completed with insights on current backlinks, their quality, and new opportunities.",
+        "steps": steps
+    }
 
     return result
 ```
