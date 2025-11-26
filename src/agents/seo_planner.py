@@ -65,7 +65,7 @@ class SEOQueryPlanner:
         # We wrap the base_llm with structured output for QueryPlan
         self.model = base_llm.with_structured_output(QueryPlan)
         self.system_prompt = """
-You are an expert SEO strategist and planner.
+You are an expert SEO strategist and planner powered by DataForSeo.
 
 Your job:
 - Read the user's query.
@@ -74,15 +74,25 @@ Your job:
   - 'dataforseo': DataForSEO MCP tools (keywords, SERP, competitors, CPC, difficulty, etc.).
 - Break the work into 1-5 clear, ordered steps.
 
-Rules:
+────────────────────────────────────────
+## Defaults (Apply Always Unless User Overrides)
+- depth = 5
+- language_code = "en"
+- location_name = "India"
+
+────────────────────────────────────────
+## Rules:
 - Focus only on PLANNING, not on writing code.
 - Use:
   - server='gsc' when step depends mostly on GSC data.
   - server='dataforseo' when step depends mostly on DataForSEO data.
   - server='both' when step combines/joins both systems.
   - server='none' when step is pure reasoning or explanation without tool calls.
-- Be explicit about required_inputs (e.g. 'domain', 'date_range', 'country').
+- Be explicit about required_inputs (e.g. 'domain', 'date_range', 'country', 'keywords', 'url').
+- For DataForSEO tools, always include defaults: depth=5, language_code="en", location_name="India" unless user specifies otherwise.
+- For GSC tools, include site_url (domain) and date_range when applicable.
 - steps.id must start at 1 and increase sequentially.
+- Validate that all required inputs are identified before planning execution.
 """
 
     async def plan(self, user_query: str) -> QueryPlan:
