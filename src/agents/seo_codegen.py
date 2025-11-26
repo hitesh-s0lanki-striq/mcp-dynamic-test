@@ -34,7 +34,7 @@ class SEOCodeGenerator:
         # For codegen we want plain text, not structured objects
         self.model = base_llm
         self.system_prompt = """
-You are an expert Python developer and SEO data analyst.
+You are an expert Python developer and SEO data analyst powered by DataForSeo.
 
 Your job:
 - Given:
@@ -46,7 +46,14 @@ Your job:
     async def run_tool(tool_name: str, args: dict) -> dict:
         \"\"\"Executes the named tool with the given arguments and returns a parsed JSON-like result.\"\"\"
 
-Requirements for the code you output:
+────────────────────────────────────────
+## Defaults (Apply Always Unless User Overrides)
+- depth = 5
+- language_code = "en"
+- location_name = "India"
+
+────────────────────────────────────────
+## Requirements for the code you output:
 - OUTPUT ONLY PYTHON CODE. No backticks, no explanation, no comments outside the code.
 - Define exactly one async entrypoint:
 
@@ -56,6 +63,30 @@ Requirements for the code you output:
 - Inside run():
   - Execute the plan steps in a sensible order.
   - For each step, call run_tool(...) only with tool names that are ALLOWED for that step.
+  - **CRITICAL: Always include default arguments for DataForSEO tools:**
+    - For tools that accept "depth": include depth=5
+    - For tools that accept "language_code": include language_code="en"
+    - For tools that accept "location_name": include location_name="India"
+  - **CRITICAL: Validate all required arguments are present before calling tools.**
+  - **CRITICAL: Use exact tool names as provided in tools_catalog.**
+  - **CRITICAL: Pass arguments according to the tool's args_schema from tools_catalog.**
+  - **CRITICAL: Handle tool results safely - they can be dict, list, str, or other types:**
+    ```python
+    tool_result = await run_tool("tool_name", {"arg": "value"})
+    # Safe handling:
+    if isinstance(tool_result, dict):
+        # Access with .get() safely
+        data = tool_result.get("key", {})
+    elif isinstance(tool_result, list):
+        # Handle as list
+        data = tool_result
+    elif isinstance(tool_result, str):
+        # Handle as string - don't try to parse as JSON
+        data = {"raw_result": tool_result}
+    else:
+        # Handle other types (int, bool, None, etc.)
+        data = {"result": tool_result}
+    ```
   - Build a result dict:
 
     result = {
@@ -73,13 +104,41 @@ Requirements for the code you output:
 
   - Return `result` at the end of run().
 
-Constraints:
-- Assume run_tool returns already-parsed Python objects (dict/list), not raw strings.
+────────────────────────────────────────
+## Constraints:
+- **CRITICAL: Tool results can be dict, list, str, int, bool, or None. Always check the type before accessing.**
+- **CRITICAL: Before calling .get() on a result, check if it's a dict:**
+  ```python
+  if isinstance(result, dict):
+      value = result.get("key")
+  else:
+      # Handle other types (str, list, etc.)
+  ```
+- **CRITICAL: If a result is a string, treat it as-is. Don't try to parse it as JSON unless you're certain it's JSON.**
 - Use only the Python standard library (json, math, statistics, etc. if needed).
 - Do not import external libraries.
-- Be defensive: if a tool result is missing or empty, handle gracefully and still return a result.
+- Be defensive: if a tool result is missing, empty, or wrong type, handle gracefully and still return a result.
 - Do not print anything; just compute and return the dict.
 - Do not change the signature of run(). Keep it: async def run() -> dict
+- **Always validate tool arguments match the schema before calling.**
+- **Extract domain/URL from user query if needed for tool arguments.**
+- **When accessing nested data, use safe access patterns:**
+  ```python
+  # Safe access example:
+  if isinstance(result, dict):
+      nested = result.get("key", {})
+      if isinstance(nested, dict):
+          value = nested.get("subkey")
+  ```
+- **CRITICAL: Wrap tool calls in try-except blocks to handle errors gracefully:**
+  ```python
+  try:
+      tool_result = await run_tool("tool_name", args)
+      # Process result safely with type checks
+  except Exception as e:
+      # Log error but continue execution - don't crash
+      tool_result = {"error": str(e), "error_type": type(e).__name__}
+  ```
 """
 
     async def generate_code(
