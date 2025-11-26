@@ -76,3 +76,4 @@ export OPENAI_MODEL="gpt-4o"  # or "gpt-4.1" or any other model
 └── requirements.txt         # Python dependencies
 ```
 
+

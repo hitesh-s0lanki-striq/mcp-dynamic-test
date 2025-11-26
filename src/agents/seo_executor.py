@@ -1,6 +1,7 @@
-from typing import Any, Dict
+from typing import Any, Dict, List
 import traceback
 import re
+import time
 
 from src.tools.seo_tools import SeoTools
 
@@ -45,10 +46,48 @@ class SEOCodeExecutor:
 
     def __init__(self, seo_tools: SeoTools):
         self.seo_tools = seo_tools
+        self.tool_logs: List[Dict[str, Any]] = []  # Track tool executions
 
     # This is what we inject into the generated code as `run_tool`
     async def _run_tool_bridge(self, tool_name: str, args: Dict[str, Any]) -> Any:
-        return await self.seo_tools.run_tool(tool_name, args)
+        """Execute tool and log the execution details."""
+        start_time = time.time()
+        tool_log = {
+            "tool_name": tool_name,
+            "args": args,
+            "status": "running",
+            "start_time": start_time,
+            "error": None,
+            "result": None,
+            "duration": None,
+        }
+        
+        try:
+            result = await self.seo_tools.run_tool(tool_name, args)
+            duration = time.time() - start_time
+            tool_log.update({
+                "status": "success",
+                "result": result,
+                "duration": duration,
+            })
+            self.tool_logs.append(tool_log)
+            return result
+        except Exception as e:
+            duration = time.time() - start_time
+            error_msg = str(e)
+            error_type = type(e).__name__
+            tb = traceback.format_exc()
+            
+            tool_log.update({
+                "status": "error",
+                "error": error_msg,
+                "error_type": error_type,
+                "traceback": tb,
+                "duration": duration,
+            })
+            self.tool_logs.append(tool_log)
+            # Re-raise the exception so the generated code can handle it
+            raise
 
     async def execute(self, code: str) -> Dict[str, Any]:
         """
@@ -94,11 +133,15 @@ class SEOCodeExecutor:
             }
 
         # 4) Execute run() and capture any runtime errors
+        # Reset tool logs for this execution
+        self.tool_logs = []
+        
         try:
             result = await run_fn()
             return {
                 "ok": True,
                 "result": result,
+                "tool_logs": self.tool_logs.copy(),  # Include tool execution logs
             }
         except Exception as e:
             tb = traceback.format_exc()
@@ -106,4 +149,5 @@ class SEOCodeExecutor:
                 "ok": False,
                 "error": f"Error during execution of run(): {e.__class__.__name__}: {e}",
                 "traceback": tb,
+                "tool_logs": self.tool_logs.copy(),  # Include tool logs even on error
             }
