@@ -8,8 +8,6 @@ SEO_CATEGORY_TOOL_HINTS = {
   "gsc_properties": {
     "gsc": [
       "list_properties",
-      "add_site",
-      "delete_site",
       "get_search_analytics",
       "get_site_details",
       "get_sitemaps",
@@ -29,8 +27,6 @@ SEO_CATEGORY_TOOL_HINTS = {
   },
   "gsc_pages": {
     "gsc": [
-      "add_site",
-      "delete_site",
       "get_search_analytics",
       "get_site_details",
       "get_sitemaps",
@@ -279,10 +275,21 @@ class SEOToolSelector:
 
             for tool_name in tools_by_name.keys():
                 # Basic server heuristic: check prefix or server tag in name
-                if step.server == "gsc" and "gsc" not in tool_name.lower():
-                    continue
-                if step.server == "dataforseo" and "dataforseo" not in tool_name.lower():
-                    continue
+                # For GSC: tools should have "gsc" in name OR be in GSC hint list
+                if step.server == "gsc":
+                    # Check if tool is in GSC hints or has gsc in name
+                    in_gsc_hints = any(hint.lower() in tool_name.lower() for hint in hints_for_server)
+                    has_gsc_in_name = "gsc" in tool_name.lower()
+                    if not (in_gsc_hints or has_gsc_in_name):
+                        continue
+                
+                # For DataForSEO: tools don't need "dataforseo" in name - they can be like "backlinks_backlinks"
+                # Just check if tool is in the hint list for this category
+                if step.server == "dataforseo":
+                    # Check if tool matches any hint for this category
+                    if not any(hint.lower() in tool_name.lower() for hint in hints_for_server):
+                        continue
+                
                 # For "both", skip this filter, we allow anything.
 
                 # Check if any hint substring is in the tool name
@@ -292,11 +299,33 @@ class SEOToolSelector:
         # 2. De-duplicate
         candidate_tools = list(dict.fromkeys(candidate_tools))  # preserve order, remove duplicates
 
-        # 3. Fallback: if nothing found by category, pick a small default set
+        # 3. Fallback: if nothing found by category, try to infer from step_goal
         if not candidate_tools:
-            fallback = self._fallback_tools_for_server(step.server, tools_by_name)
-            candidate_tools.extend(fallback)
-            notes = "Used fallback tools for server; no category-based match found."
+            # Try to infer category from step_goal text
+            inferred_category = self._infer_category_from_goal(step.goal, step.server)
+            if inferred_category:
+                hints_for_category = SEO_CATEGORY_TOOL_HINTS.get(inferred_category, {})
+                hints_for_server = hints_for_category.get(step.server, [])
+                for tool_name in tools_by_name.keys():
+                    # For DataForSEO, don't filter by "dataforseo" in name
+                    if step.server == "dataforseo":
+                        if any(hint.lower() in tool_name.lower() for hint in hints_for_server):
+                            candidate_tools.append(tool_name)
+                    elif step.server == "gsc":
+                        if "gsc" in tool_name.lower() and any(hint.lower() in tool_name.lower() for hint in hints_for_server):
+                            candidate_tools.append(tool_name)
+                
+                candidate_tools = list(dict.fromkeys(candidate_tools))[:6]
+                if candidate_tools:
+                    notes = f"Selected tools based on inferred category '{inferred_category}' from step goal."
+                else:
+                    fallback = self._fallback_tools_for_server(step.server, tools_by_name)
+                    candidate_tools.extend(fallback)
+                    notes = "Used fallback tools for server; no category-based match found."
+            else:
+                fallback = self._fallback_tools_for_server(step.server, tools_by_name)
+                candidate_tools.extend(fallback)
+                notes = "Used fallback tools for server; no category-based match found."
         else:
             notes = "Selected tools based on categories and name-hints."
 
@@ -341,4 +370,44 @@ class SEOToolSelector:
 
         # 3) Limit to max_tools
         return unique[:max_tools]
+    
+    def _infer_category_from_goal(self, goal: str, server: str) -> Optional[str]:
+        """
+        Infer SEO category from step goal text when categories are missing.
+        """
+        goal_lower = goal.lower()
+        
+        # Backlinks
+        if any(kw in goal_lower for kw in ["backlink", "referring domain", "anchor", "link profile"]):
+            return "backlinks"
+        
+        # Keywords
+        if any(kw in goal_lower for kw in ["keyword", "search volume", "cpc", "keyword research", "keyword idea"]):
+            return "keywords"
+        
+        # SERP
+        if any(kw in goal_lower for kw in ["serp", "search result", "organic result", "ranking"]):
+            return "serp"
+        
+        # GSC Performance
+        if server == "gsc" and any(kw in goal_lower for kw in ["performance", "traffic", "clicks", "impressions", "ctr"]):
+            return "gsc_performance"
+        
+        # GSC Queries
+        if server == "gsc" and any(kw in goal_lower for kw in ["query", "queries", "search query"]):
+            return "gsc_queries"
+        
+        # GSC Pages
+        if server == "gsc" and any(kw in goal_lower for kw in ["page", "pages", "url", "landing page"]):
+            return "gsc_pages"
+        
+        # Technical Audit
+        if any(kw in goal_lower for kw in ["sitemap", "indexing", "coverage", "technical", "audit"]):
+            return "technical_audit"
+        
+        # Rank Tracking
+        if any(kw in goal_lower for kw in ["rank", "position", "ranking"]):
+            return "rank_tracking"
+        
+        return None
 

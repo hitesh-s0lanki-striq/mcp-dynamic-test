@@ -1,3 +1,4 @@
+import json
 from langchain.agents import create_agent
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
@@ -54,7 +55,14 @@ class SEOAgent:
         """
         For a given plan, determine which concrete tools to expose/use per step.
         """
-        return await self._tool_selector.select_for_plan(plan)
+        
+        tool_selection = await self._tool_selector.select_for_plan(plan)
+        
+        # store the plan in a file
+        with open("logs/plan.json", "w") as f:
+            json.dump(tool_selection.model_dump(), f)
+            
+        return tool_selection
 
     async def generate_code_for_query(
         self,
@@ -97,7 +105,13 @@ class SEOAgent:
         plan = await self.plan_query(user_query)
         tool_selection = await self.select_tools_for_plan(plan)
         code = await self.generate_code_for_query(user_query, plan, tool_selection)
+        
+        # store the code in a file
+        with open("logs/code.txt", "w") as f:
+            f.write(code)
+            
         execution = await self.execute_generated_code(code)
+        
 
         return {
             "plan": plan.dict(),

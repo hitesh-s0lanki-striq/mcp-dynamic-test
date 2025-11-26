@@ -47,8 +47,8 @@ Your job:
         \"\"\"Executes the named tool with the given arguments and returns a parsed JSON-like result.\"\"\"
 
 ────────────────────────────────────────
-## Defaults (Apply Always Unless User Overrides)
-- depth = 5
+## Defaults (Apply Always Unless User Overrides in required_inputs for dataForSEO tools)
+- depth = 10
 - language_code = "en"
 - location_name = "India"
 
@@ -72,20 +72,30 @@ Your job:
   - **CRITICAL: Pass arguments according to the tool's args_schema from tools_catalog.**
   - **CRITICAL: Handle tool results safely - they can be dict, list, str, or other types:**
     ```python
-    tool_result = await run_tool("tool_name", {"arg": "value"})
-    # Safe handling:
-    if isinstance(tool_result, dict):
-        # Access with .get() safely
-        data = tool_result.get("key", {})
-    elif isinstance(tool_result, list):
-        # Handle as list
-        data = tool_result
-    elif isinstance(tool_result, str):
-        # Handle as string - don't try to parse as JSON
-        data = {"raw_result": tool_result}
-    else:
-        # Handle other types (int, bool, None, etc.)
-        data = {"result": tool_result}
+    # CORRECT PATTERN for a complete step:
+    try:
+        tool_result = await run_tool("tool_name", {"arg": "value"})
+        # Store result AS-IS - ALL types are valid (dict, list, str, int, bool, None)
+        raw_results = tool_result
+        
+        # Generate insights based on result type (optional):
+        if isinstance(tool_result, dict):
+            key_insights = f"Retrieved data with {len(tool_result)} keys"
+        elif isinstance(tool_result, list):
+            key_insights = f"Retrieved {len(tool_result)} items"
+        elif isinstance(tool_result, str):
+            key_insights = f"Retrieved result: {tool_result[:100]}"
+        else:
+            key_insights = f"Retrieved result of type {type(tool_result).__name__}"
+    except Exception as e:
+        raw_results = {"error": str(e), "error_type": type(e).__name__}
+        key_insights = f"Error: {str(e)}"
+    
+    # WRONG PATTERN - DO NOT DO THIS:
+    # if isinstance(tool_result, dict):
+    #     raw_results = tool_result
+    # else:
+    #     raw_results = {"error": "Unexpected result type"}  # ❌ Rejects valid results!
     ```
   - Build a result dict:
 
@@ -106,15 +116,31 @@ Your job:
 
 ────────────────────────────────────────
 ## Constraints:
-- **CRITICAL: Tool results can be dict, list, str, int, bool, or None. Always check the type before accessing.**
-- **CRITICAL: Before calling .get() on a result, check if it's a dict:**
+- **CRITICAL: Tool results can be dict, list, str, int, bool, or None. ALL types are VALID results.**
+- **CRITICAL: Store tool results AS-IS in raw_results. Do NOT reject non-dict results.**
   ```python
-  if isinstance(result, dict):
-      value = result.get("key")
+  # CORRECT: Accept any result type
+  tool_result = await run_tool("tool_name", args)
+  raw_results = tool_result  # Store directly, regardless of type
+  
+  # WRONG: Don't do this - it rejects valid list/str results
+  if isinstance(tool_result, dict):
+      raw_results = tool_result
   else:
-      # Handle other types (str, list, etc.)
+      raw_results = {"error": "Unexpected result type"}  # ❌ This is wrong!
   ```
-- **CRITICAL: If a result is a string, treat it as-is. Don't try to parse it as JSON unless you're certain it's JSON.**
+- **CRITICAL: Only use type checks when ACCESSING nested data, not when storing results:**
+  ```python
+  # When storing: accept any type
+  raw_results = tool_result
+  
+  # When accessing nested data: check type first
+  if isinstance(tool_result, dict):
+      value = tool_result.get("key")  # Safe to use .get() on dicts
+  elif isinstance(tool_result, list):
+      value = tool_result[0] if tool_result else None  # Safe to index lists
+  # str, int, bool, None are also valid - use them directly
+  ```
 - Use only the Python standard library (json, math, statistics, etc. if needed).
 - Do not import external libraries.
 - Be defensive: if a tool result is missing, empty, or wrong type, handle gracefully and still return a result.

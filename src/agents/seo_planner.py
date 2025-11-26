@@ -1,3 +1,4 @@
+import json
 from typing import List, Literal, Optional
 from pydantic import BaseModel, Field
 from langchain_openai import ChatOpenAI
@@ -65,7 +66,7 @@ class SEOQueryPlanner:
         # We wrap the base_llm with structured output for QueryPlan
         self.model = base_llm.with_structured_output(QueryPlan)
         self.system_prompt = """
-You are an expert SEO strategist and planner powered by DataForSeo.
+You are an expert SEO strategist and planner.
 
 Your job:
 - Read the user's query.
@@ -75,8 +76,8 @@ Your job:
 - Break the work into 1-5 clear, ordered steps.
 
 ────────────────────────────────────────
-## Defaults (Apply Always Unless User Overrides)
-- depth = 5
+## Defaults (Apply Always Unless User Overrides in required_inputs for dataForSEO tools)
+- depth = 10
 - language_code = "en"
 - location_name = "India"
 
@@ -88,7 +89,16 @@ Your job:
   - server='dataforseo' when step depends mostly on DataForSEO data.
   - server='both' when step combines/joins both systems.
   - server='none' when step is pure reasoning or explanation without tool calls.
-- Be explicit about required_inputs (e.g. 'domain', 'date_range', 'country', 'keywords', 'url').
+- Be explicit about required_inputs (e.g. 'domain', 'date_range', 'country', 'keywords', 'url', 'language_code' , 'location_name', 'depth').
+- **CRITICAL: Always assign appropriate categories to each step based on the goal:**
+  - For backlink-related goals: categories = ["backlinks"]
+  - For keyword-related goals: categories = ["keywords"]
+  - For SERP/ranking goals: categories = ["serp"] or ["rank_tracking"]
+  - For GSC performance: categories = ["gsc_performance"]
+  - For GSC queries: categories = ["gsc_queries"]
+  - For GSC pages: categories = ["gsc_pages"]
+  - For technical/audit goals: categories = ["technical_audit"]
+  - You can assign multiple categories if the step covers multiple areas
 - For DataForSEO tools, always include defaults: depth=5, language_code="en", location_name="India" unless user specifies otherwise.
 - For GSC tools, include site_url (domain) and date_range when applicable.
 - steps.id must start at 1 and increase sequentially.
@@ -113,4 +123,9 @@ Your job:
         # Because we used with_structured_output(QueryPlan),
         # ainvoke will directly return a QueryPlan instance.
         plan: QueryPlan = await self.model.ainvoke(messages)
+        
+        # store the plan in a file
+        with open("logs/plan.json", "w") as f:
+            json.dump(plan.model_dump(), f)
+        
         return plan
